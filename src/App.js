@@ -22,14 +22,14 @@ function App() {
                 }
             });
             result = await result.json();
-            if (result.insertedCount) {
+            if (result.error) {
+                setIsError(true);
+                setMessage(result.error);
+            } else {
                 setIsError(false);
                 setMessage('File uploaded successfully!');
                 setchildrensData([]);
                 inputRef.current.value = null;
-            } else {
-                setIsError(true);
-                setMessage("Error during file upload!");
             }
 
         } else {

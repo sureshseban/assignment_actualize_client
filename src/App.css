@@ -6,3 +6,15 @@
   padding: 200px;
   background-color: #00fff71c;
 }
+
+.message {
+  padding: 10px 0;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}

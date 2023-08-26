@@ -1,14 +1,19 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import * as  XLSX from 'xlsx';
+
 import './App.css';
 
 function App() {
 
     const [childrensData, setchildrensData] = useState([]);
+    const [message, setMessage] = useState('');
+    const [isError, setIsError] = useState(false);
+    const inputRef = useRef(null);
 
     // upload/save child data
     const handleClick = async (e) => {
         if (childrensData.length) {
+            setMessage('File Uploading. Please wait!!');
             let result = await fetch("http://localhost:5000/save_children", {
                 method: 'post',
                 body: JSON.stringify(childrensData),
@@ -17,14 +22,25 @@ function App() {
                 }
             });
             result = await result.json();
-            console.log(result);
+            if (result.insertedCount) {
+                setIsError(false);
+                setMessage('File uploaded successfully!');
+                setchildrensData([]);
+                inputRef.current.value = null;
+            } else {
+                setIsError(true);
+                setMessage("Error during file upload!");
+            }
+
         } else {
-            console.log('Please select your file!!');
+            setIsError(true);
+            setMessage('Please select your file!!');
         }
     }
 
     // extracting the excel values
     const handleFileUpload = (e) => {
+        setMessage('');
         const reader = new FileReader();
         reader.readAsBinaryString(e.target.files[0]);
         reader.onload = (e) => {
@@ -39,8 +55,11 @@ function App() {
 
     return (
         <div className="container">
-            <input type="file" id="myFile" required accept='.xls,.xlsx' onChange={handleFileUpload} name="filename"></input>
+            <input ref={inputRef} type="file" id="myFile" required accept='.xls,.xlsx' onChange={handleFileUpload} name="filename"></input>
             <button onClick={handleClick} >Upload</button>
+            <div className="message">
+                <span className={isError ? 'error' : 'success'}>{message}</span>
+            </div>
         </div>
     );
 }
